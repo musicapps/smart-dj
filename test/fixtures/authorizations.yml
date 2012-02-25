@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  source: MyString
+  source_id: MyString
+  auth_id: MyString
+
+two:
+  source: MyString
+  source_id: MyString
+  auth_id: MyString

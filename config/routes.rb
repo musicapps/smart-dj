@@ -1,4 +1,15 @@
 SmartDj::Application.routes.draw do
+  
+  #resources :authorizations, :only => [ :show, :create ]
+  
+  match '/source_auth/:source/:id', :to=>'authorizations#show', :via=>'get'
+  match '/source_auth/:source/callback' => 'authorizations#create' , :via=>"post"
+  
+
+  #match '/auth/redirect', :to=>'authentications#redirect', :via=>"post"
+  #match '/auth/:provider/callback' => 'authentications#create'
+  
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
