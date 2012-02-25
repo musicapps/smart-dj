@@ -5,7 +5,7 @@ class CreateSongs < ActiveRecord::Migration
       t.string :dj_foursquare_id
       t.string :echo_nest_song_id
       t.timestamp :start_play_time
-      t.boolean :currently_playing
+      t.integer :currently_playing
       t.float :song_length
 
       t.timestamps

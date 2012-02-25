@@ -3,12 +3,20 @@
     <script type="text/javascript" src=http://google.com/jsapi/></script>
     <script type="text/javascript">google.load('jquery','1.7.1')</script>    
     <script language=JavaScript>
-        var url = '/songs'
+    
+        var url = '/feedback'
         $.ajax({
           url:url,
-          data: {song:{foursquare_venue_id:'foo',dj_foursquare_id:'foo',echo_nest_song_id:'foo'}},
+          data: {feedback:{echo_nest_song_id: 'foo2ddaaa', foursquare_venue_id: 'foo', listener_foursquare_id: 'myfakeid', vote_attribute: 'hot'}},
           type:'POST'
-        });
+        });        
+        
+        //var url = '/songs'
+        //$.ajax({
+        //  url:url,
+        //  data: {song:{foursquare_venue_id:'foo2',dj_foursquare_id:'foo2ddaaa',echo_nest_song_id:'foo2ddaaa'}},
+        //  type:'POST'
+        //});
     </script>    
   </head>
 </html>

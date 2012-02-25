@@ -7,6 +7,8 @@ SmartDj::Application.routes.draw do
   
   resources :songs, :only => [ :show, :create ]
 
+  resources :feedback, :only=> [ :show, :create ]
+  
   #match '/auth/redirect', :to=>'authentications#redirect', :via=>"post"
   #match '/auth/:provider/callback' => 'authentications#create'
   

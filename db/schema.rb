@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120225195742) do
+ActiveRecord::Schema.define(:version => 20120225221902) do
 
   create_table "authorizations", :force => true do |t|
     t.string   "source"
@@ -21,12 +21,21 @@ ActiveRecord::Schema.define(:version => 20120225195742) do
     t.datetime "updated_at"
   end
 
+  create_table "song_feedbacks", :force => true do |t|
+    t.integer  "song_id"
+    t.string   "foursquare_venue_id"
+    t.string   "listener_foursquare_id"
+    t.string   "vote_attribute"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "songs", :force => true do |t|
     t.string   "foursquare_venue_id"
     t.string   "dj_foursquare_id"
     t.string   "echo_nest_song_id"
     t.datetime "start_play_time"
-    t.boolean  "currently_playing"
+    t.integer  "currently_playing"
     t.float    "song_length"
     t.datetime "created_at"
     t.datetime "updated_at"
