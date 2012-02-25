@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	choose currently playing song
+<style type="text/css">
+	em{margin-left:20px}
+</style>
+<script type="text/javascript" src=http://google.com/jsapi/></script>
+<script type="text/javascript">google.load('jquery','1.7.1')</script>
+<script type="text/javascript">
+	
+	var url = 'http://developer.echonest.com/api/v4/playlist/static?api_key=N6E4NIOVYMTHNDM8J&description=90s&description=disco&type=artist-description&artist_min_familiarity=.7&sort=tempo-asc&results=20'
+	$.ajax({
+		url:url,
+		type:'GET',
+		success:function(dat){
+			console.log(dat.response.songs)
+			$(dat.response.songs).each(function(){
+				console.log(this)
+				$('body').append('<li><a data-songid=' + this.id + ' href=/ >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
+			})
+		}
+	})
+	$('a').click(function(e){
+		e.preventDefault()
+		// songs/location/:songid/:authid
+		// songs/location/songid=123
+		var url = 'songs/location'
+		$.ajax({
+			url:url,
+			data: "{song:{foursquare_venue_id:'foo',dj_foursquare_id:'foo',echo_nest_song_id:'foo'}}",
+			type:'POST'
+		})
+
+	})
+
+
+</script>
+
+
+<!--
+artist_id: "ARXFB7K1187B9B1E54"
+artist_name: "Missy Elliott"
+id: "SOZYXZU12A6D4FD303"
+title: "Get Ur Freak On (Amended LP Version)"
+__proto__: Object
+-->
+
+</body>
+</html>
