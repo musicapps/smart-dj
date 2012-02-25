@@ -5,6 +5,9 @@
 	<title></title>
 </head>
 <body>
+
+
+	<h1>Now playing : <strong>show song</strong> </h1>
 	choose currently playing song
 <style type="text/css">
 	em{margin-left:20px}
@@ -22,13 +25,42 @@ BY = (function() {
 
         init: function(){
         	by.app.showSongs()
+        	by.app.fetchCurrentSong()
+        },
+        fetchCurrentSong:function(){
+
+        	$venueId = '4e6616838877954de9b79ab8'
+        	$returnedSongId = 'SOOSHQA1315CD49B9B'
+        	var defUrl = '/songs/' + $venueId
+        	$.ajax({
+        		url:defUrl,
+        		type:'GET',
+        		success:function(data){
+
+        			$returnedSongId = data.song.echo_nest_song_id
+        			console.log(currentSongEchoId)
+        			var newUrl = 'http://developer.echonest.com/api/v4/song/profile?api_key=N6E4NIOVYMTHNDM8J&format=json&id=' + $returnedSongId
+        			$.ajax({
+        				url:newUrl,
+        				type:'GET',
+        				success:function(data){
+        					var songTitle = data.response.songs[0].title,
+        						artistName = data.response.songs[0].artist_name
+
+        						$('h1>strong').text(songTitle + ', ' + artistName)
+
+        				}
+        			})
+
+        		}
+        	})
         },
         fetchToken:function() {
             $token = window.location.hash.split('=')[1]
-            console.log($token)
+            // console.log($token)
 
             var venueSearch = 'https://api.foursquare.com/v2/venues/search?ll=40.740648,-73.98689&oauth_token=' + $token
-            console.log(venueSearch)
+
 
             $.ajax({url:venueSearch,type:'GET',success:function(data) {
 
@@ -36,7 +68,7 @@ BY = (function() {
                     $venueId = this.id
 
                     $('body').append('<div id=loc />')
-                    $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '<br/>' + this.id + '</a></li>')
+                    $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '</a><br/>' + this.id + '</li>')
 
 
                 })
@@ -62,9 +94,8 @@ BY = (function() {
 				url:url,
 				type:'GET',
 				success:function(dat){
-					// console.log(dat.response.songs)
 					$(dat.response.songs).each(function(){
-						// console.log(this)
+
 						$('body').append('<li><a data-songid=' + this.id + ' href=/ >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
 					})
 				}
@@ -80,7 +111,6 @@ $.ajax({
 })
 
 			$('a').live('click', function(e){
-				console.log('detect')
 				e.preventDefault()
 				// songs/location/:songid/:authid
 				// songs/location/songid=123
