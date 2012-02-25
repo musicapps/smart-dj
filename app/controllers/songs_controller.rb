@@ -4,7 +4,7 @@ class SongsController < ApplicationController
     # param is venueid
     venue_id=params[:id]
     
-    s=Songs.find_by_foursquare_venue_id(venue_id, :order=>'start_play_time desc')
+    s=Songs.find_by_foursquare_venue_id_and_currently_playing(venue_id, true)
     if s
       render :json => { :song=>s }
     else
