@@ -35,15 +35,15 @@ BY = (function() {
                 $(data.response.groups[0].items).each(function() {
                     $venueId = this.id
 
-
-                    $('body').append('<li><a class=' + this.id + ' href=/ >' + this.name + '<br/>' + this.id + '</a></li>')
+                    $('body').append('<div id=loc />')
+                    $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '<br/>' + this.id + '</a></li>')
 
 
                 })
             }})
 
 
-            $('a').live('click', function(e) {
+            $('#loc a').live('click', function(e) {
                 e.preventDefault()
 				$venueId = $(this).attr('class')
                 var url = 'https://api.foursquare.com/v2/checkins/add?venueId=' + $venueId + '&oauth_token=' + $token
@@ -70,7 +70,6 @@ BY = (function() {
 				}
 			})        	
 
-var getUserObjUrl = 'https://api.foursquare.com/v2/users/self?oauth_token=EDJIGF43OJABPNZK2ACPKEOCJKPNH3JO5BQVYB15CX3IHNNO&v=20120225'
 var getUserObjUrl = 'https://api.foursquare.com/v2/users/self?oauth_token=' + $token + '&v=20120225'
 $.ajax({
 	url:getUserObjUrl,
@@ -80,13 +79,13 @@ $.ajax({
 	}
 })
 
-			$('a').click(function(e){
+			$('a').live('click', function(e){
+				console.log('detect')
 				e.preventDefault()
 				// songs/location/:songid/:authid
 				// songs/location/songid=123
-				var url = 'songs',
-					echoNestSongId = $('this').attr('data-songid')
-					console.log(echoNestSongId)
+				var url = '/songs',
+					$echoNestSongId = $(this).attr('data-songid')
 				$.ajax({
 					url:url,
 					data: {song:{foursquare_venue_id: $venueId,dj_foursquare_id:$userFoursquareId,echo_nest_song_id:$echoNestSongId}},
