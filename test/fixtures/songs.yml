@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  foursquare_venue_id: MyString
+  dj_foursquare_id: MyString
+  echo_nest_song_id: MyString
+  start_play_time: 2012-02-25 14:57:42
+  currently_playing: false
+  song_length: 1.5
+
+two:
+  foursquare_venue_id: MyString
+  dj_foursquare_id: MyString
+  echo_nest_song_id: MyString
+  start_play_time: 2012-02-25 14:57:42
+  currently_playing: false
+  song_length: 1.5
