@@ -10,7 +10,7 @@
         margin-left: 20px
     }
     .hide{display:none}
-    a{text-decoration:none;color:#BBB}
+    a{text-decoration:none;color:#333}
     a:hover{text-decoration:underline;font-weight:bold}
     #wrap{width:980px;margin-left:auto;margin-right:auto;border:1px solid #333;padding:20px;overflow:auto}
     li{list-style-type:none;margin:10px 0}
@@ -239,6 +239,7 @@
                 djUser:{
                     djInit:function(){
                         $('body').css({background:'#000',color:'#fff'})
+                        $('a').css({color:'#bbb'})
                         $('#main').attr('src','/img/logo-inverted.jpg')
 
                         var modifyFam = .5,                        
