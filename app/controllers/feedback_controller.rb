@@ -5,8 +5,8 @@ class FeedbackController < ApplicationController
     venue_id=params[:id]
     
     feedback=SongFeedback.find_all_by_foursquare_venue_id(venue_id)
-        
-    render :json => { :feedback=>feedback }
+    songs=Songs.all    
+    render :json => { :feedback=>feedback, :songs=>songs }
     
   end
   

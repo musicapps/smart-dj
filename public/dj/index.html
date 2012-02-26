@@ -34,6 +34,7 @@
 
             init: function() {
                 by.app.handleListeners.buttonInterface()
+                songIds = [],
                 songHot = [],
                 songFam = [],
                 crowdHot = [],
@@ -42,12 +43,75 @@
                 by.app.visChart()
 
             },
+            updateChartVotes:function(){
+              var urlFeedback='/feedback/' + $('body').attr('data-venueid')
+                                  
+              $.ajax({
+                  url:urlFeedback,
+                  type:'GET',
+                  success:function(dat){
+                    var songs=[]
+                    $(dat.songs).each(function() {
+                      songs[this.id]=this.echo_nest_song_id
+                    })
+                    
+                    chart_dirty=false
+                    
+                    sHot=songHot.pop()
+                    songHot.push(sHot)
+                    sFam=songFam.pop()
+                    songFam.push(sFam)
+                    
+                    cHotNew=sHot
+                    cFamNew=sFam
+                    
+                    $(songIds).each(function(){
+                      sid=this
+                      $(dat.feedback).each(function(){
+                        feedback_song_id=songs[this.song_id]                                                
+                         if ( feedback_song_id == sid ){
+                           if (this.vote_attribute === 'more hot'){
+                             cHotNew=cHotNew+0.25
+                           } else if (this.vote_attribute === 'less hot') {
+                             cHotNew=cHotNew-0.25
+                           } else if (this.vote_attribute === 'more familiar') {
+                             cFamNew=cFamNew+0.25
+                           } else if (this.vote_attribute === 'less familiar') {
+                             cFamNew=cFamNew-0.25
+                           }                           
+                         }
+                      })
+                        
+                    })
+                    
+                    // detect if anything changed
+                    cHotOrig=crowdHot.pop()
+                    if (cHotOrig === cHotNew){                      
+                      crowdHot.push(cHotOrig)
+                    } else{
+                      crowdHot.push(cHotNew)
+                      chart_dirty=true
+                    }
+                    
+                    cFamOrig=crowdFam.pop()
+                    if (cFamOrig === cFamNew){                      
+                      crowdFam.push(cFamOrig)
+                    } else{
+                      crowdFam.push(cFamNew)
+                      chart_dirty=true
+                    }
+                    
+                    if (chart_dirty){                      
+                      by.app.visChart()
+                    }                               
+                  }
+              })
+            },
+            
             visChart:function(){
                 var chart;
                 $(document).ready(function() {
                     // var baseArray = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
-
-
 
                     chart = new Highcharts.Chart({
                         chart: {
@@ -137,23 +201,22 @@
                 djUser:{
                     djInit:function(){
                         console.log('hide')
-                        var modifyMinFam = .5,
-                        modifyMaxFam = modifyMinFam + .1,
+                        var modifyFam = .5,                        
                         modifyDesc = 'disco',
                         modifyResults = 20,
                         modifyStyle = '90s',
-                        modifyMinHot = .5,
-                        modifyMaxHot = modifyMinHot + .1
-                        by.app.showSongs(modifyStyle,modifyDesc,modifyMinFam,modifyResults,modifyMinHot)
-
+                        modifyHot = .5
+                        by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)
 
                     }
                 },
                 listenUser:{
                     listenerInit:function(){
                         console.log('start listening') 
-                        $('#song-vote').show() 
-                        setInterval('BY.app.fetchCurrentSong()', 8000) 
+                        $('#song-vote').show()
+                        //by.app.fetchCurrentSong() 
+                        setInterval('BY.app.fetchCurrentSong()', 5000)
+                        setTimeout('setInterval("BY.app.updateChartVotes()", 3000)', 8000) 
                     }
                 }
             },
@@ -178,7 +241,7 @@
                       by.app.handleListeners.feedback(voteAttr)
                     })
                 }
-            },
+            },            
             fetchCurrentSong:function() {
 
                 // $venueId = '4e6616838877954de9b79ab8'
@@ -189,46 +252,54 @@
                     type:'GET',
                     success:function(data) {
 
-
-
                         $returnedSongId = data.song.echo_nest_song_id
 
-                        var newUrl = 'http://developer.echonest.com/api/v4/song/profile?api_key=N6E4NIOVYMTHNDM8J&format=json&id=' + $returnedSongId
-                        $.ajax({
-                            url:newUrl,
-                            type:'GET',
-                            success:function(data) {
-                                var songTitle = data.response.songs[0].title,
-                                        artistName = data.response.songs[0].artist_name
-
-                                $('h1>strong').text(songTitle + ', ' + artistName)
-                                $('body').attr('data-echonestid',$returnedSongId)
-
-                                var artistId = data.response.songs[0].artist_id
-
-                                var url = 'http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=N6E4NIOVYMTHNDM8J&id=' + artistId + '&format=json',
-                                    urlFam = 'http://developer.echonest.com/api/v4/artist/familiarity?api_key=N6E4NIOVYMTHNDM8J&id=' + artistId + '&format=json'
-                                $.ajax({
-                                    url:url,
-                                    type:'GET',
-                                    success:function(data){
-                                        var thisHotness = data.response.artist.hotttnesss * 10
-                                        console.log(thisHotness)
-                                        songHot.push(thisHotness)
-                                        by.app.visChart()           
-                                    }
-                                })
-                                $.ajax({
-                                    url:urlFam,
-                                    type:'GET',
-                                    success:function(dat){
-                                        songFam.push(dat.response.artist.familiarity * 10)
-                                        by.app.visChart()           
-                                    }
-                                })
-                            }
-                        })
-
+                        if (!$('body').attr('data-echonestid') || !($('body').attr('data-echonestid') == $returnedSongId) ){ 
+                          
+                          var newUrl = 'http://developer.echonest.com/api/v4/song/profile?api_key=N6E4NIOVYMTHNDM8J&format=json&id=' + $returnedSongId
+                          $.ajax({
+                              url:newUrl,
+                              type:'GET',
+                              success:function(data) {
+                                  var songTitle = data.response.songs[0].title,
+                                          artistName = data.response.songs[0].artist_name
+  
+                                  $('h1>strong').text(songTitle + ', ' + artistName)
+                                  $('body').attr('data-echonestid',$returnedSongId)
+  
+                                  var artistId = data.response.songs[0].artist_id
+                                  var songId = data.response.songs[0].id
+                                  
+                                  songIds.push(songId)
+  
+                                  var url = 'http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=N6E4NIOVYMTHNDM8J&id=' + artistId + '&format=json',
+                                      urlFam = 'http://developer.echonest.com/api/v4/artist/familiarity?api_key=N6E4NIOVYMTHNDM8J&id=' + artistId + '&format=json'
+                                  $.ajax({
+                                      url:url,
+                                      type:'GET',
+                                      success:function(data){
+                                          var thisHotness = data.response.artist.hotttnesss * 10
+                                          console.log(thisHotness)
+                                          songHot.push(thisHotness)
+                                          crowdHot.push(thisHotness)
+                                          by.app.visChart()                                                    
+                                      }
+                                  })
+                                  $.ajax({
+                                      url:urlFam,
+                                      type:'GET',
+                                      success:function(dat){
+                                          songFam.push(dat.response.artist.familiarity * 10)
+                                          crowdFam.push(dat.response.artist.familiarity * 10)
+                                          by.app.visChart() 
+                                      }
+                                  })
+                                                                    
+                                  
+                                  
+                              }
+                          })
+                      }
                     }
                 })
             },
@@ -268,16 +339,14 @@
                     })
                 })
             },
-            showSongs:function(modifyStyle,modifyDesc,modifyMinFam,modifyResults,modifyMinHot) {
-                var modifyMinFam = .5,
-                    modifyMaxFam = modifyMinFam + .1
+            showSongs:function(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot) {
+                var modifyMinFam = modifyFam - .1,
+                    modifyMaxFam = modifyFam + .1,
                     modifyDesc = 'disco',
                     modifyResults = 20,
                     modifyStyle = '90s',
-                    modifyMinHot = .5,
-                    modifyMaxHot = modifyMinHot + .1
-
-                var modifyFam = modifyFam
+                    modifyMinHot = modifyHot - .1,
+                    modifyMaxHot = modifyHot + .1
 
                 var url = 'http://developer.echonest.com/api/v4/playlist/static?api_key=N6E4NIOVYMTHNDM8J&description=' + modifyStyle + '&description=' + modifyDesc + '&type=artist-description&artist_min_familiarity=' + modifyMinFam + '&artist_max_familiarity=' + modifyMaxFam + '&sort=tempo-asc&results=' + modifyResults + '&artist_min_hotttnesss=' + modifyMinHot + '&artist_max_hotttnesss=' + modifyMaxHot + '&variety=.5'
                 $.ajax({
@@ -340,9 +409,11 @@
 
 <div id="container" style="width: 800px; height: 400px; margin: 0 auto"></div>
 <ul id=song-vote class=hide>
-    <li><a class=vote-hot href="/">hotter</a></li>
+    <li><a class=vote-less-hot href="/">less hot</a></li>
+    <li><a class=vote-hot href="/">more hot</a></li>
     <li><a class=vote-same href="/">same</a></li>
-    <li><a class=vote-familiar href="/">familiar</a></li>
+    <li><a class=vote-familiar href="/">more familiar</a></li>
+    <li><a class=vote-less-familiar href="/">less familiar</a></li>
 </ul>
 
 </body>
