@@ -254,9 +254,8 @@
               })
             },           
             getMoreSongs:function(){
-              cFam=crowdFam.pop()
-              crowdFam.push(cFam)
-              cHot=crowdHot.pop()
+              cFam=crowdFam.[crowdFam-1]
+              cHot=crowdHot.[crowdHot-1]
               crowdHot.push(cHot)
               by.app.showSongs('modifyStyle','modifyDesc',cFam/10.0,'modifyResults',cHot/10.0)              
             },
