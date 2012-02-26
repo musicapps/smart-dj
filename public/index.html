@@ -10,6 +10,9 @@
     var client_id;
     var callback_url;
 
+    if (window.location.hostname == 'musicmonster.co'){
+      client_id = '10P2BYKSCBKNSHSCMHQHHRMEJ2L5SRCXPL0S1J0KSNAYDPMD';
+      callback_url = 'http://musicmonster.co/dj/';
     if (window.location.hostname == 'musicmonster.heroku.com'){
       client_id = 'UVKGGMHGHZCUTLNRE5ZBWTNBWCAORIBRKS3MEP2X5JR01VOI';
       callback_url = 'http://musicmonster.heroku.com/dj/';
