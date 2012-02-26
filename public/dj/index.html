@@ -15,6 +15,7 @@
         margin-left: 20px
     }
     .hide{display:none}
+
 </style>
 
 <script type="text/javascript" src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
@@ -38,7 +39,7 @@
             },
             updateChartVotes:function(){
               // race condition if no songs added yet.
-              if (songHot.length > 0 && songFam.length > 0){                
+              if (songHot.length && songFam.length){                
                 var urlFeedback='/feedback/' + $('body').attr('data-venueid')
                 $.ajax({
                     url:urlFeedback,
@@ -106,7 +107,6 @@
                 })
               }
             },
-            
             visChart:function(){
                 var chart;
                 $(document).ready(function() {
@@ -358,10 +358,10 @@
                 $.ajax({
                     url:url,
                     type:'GET',
-                    success:function(dat) {                        
+                    success:function(dat) {
                         $('#dj-songs').empty()
-                        $(dat.response.songs).each(function() {            
-                          $('#dj-songs').append('<li><a data-songid=' + this.id + ' href=/ >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
+                        $(dat.response.songs).each(function() {
+                            $('#dj-songs').append('<li><a class=song-listing data-songid=' + this.id + ' href=# >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
                         })
                     }
                 })
@@ -376,44 +376,53 @@
                     }
                 })
 
-                $('#dj-songs a').live('click', function(e) {
-
-                    var that = this
+                $('#dj-songs .song-listing').live('click', function(e) {
+                    e.preventDefault()
                     // show song get id
+                    var that = this
                     var queryVal = $(this).text()
                     console.log(queryVal)
                     var url = 'http://ws.spotify.com/search/1/track?q=' + queryVal
-                    console.log(url)
+                    // console.log(url)
                     $.ajax({
                         url:url,
                         type:'GET',
                         dataType:'xml',
                         success:function(data){
-                            console.log(data)
-                            console.log($(data).find('track').eq(0).attr('href'))
-                            $(that).attr('href',$(data).find('track').eq(0).attr('href'))
-                    e.preventDefault()
-                            $(that).click()
+
+                            //$(that).attr('href',$(data).find('track').eq(0).attr('href'))
+                            // console.log($(data).find('track').eq(0).attr('href'))
+                            if ($(data).find('track').eq(0).attr('href')){
+                              alert('Song found on Spotify')
+                              console.log(that)
+                              var spotifyUrl = $(data).find('track').eq(0).attr('href')   
+                              $('<a class=play-track-btn href=' + spotifyUrl + ' >play</a>  ').insertBefore(that)
+                            }
 
                         }
                     })
 
-                    // $(this).attr('href','spotify:track:6PZDPg3dZgJkNL6nVMUB4b')
-
-                    // songs/location/:songid/:authid
-                    // songs/location/songid=123
                     var url = '/songs',
                             $echoNestSongId = $(this).attr('data-songid')
                     $.ajax({
                         url:url,
                         data: {song:{foursquare_venue_id: $venueId,dj_foursquare_id:$userFoursquareId,echo_nest_song_id:$echoNestSongId}},
                         type:'POST',
+<<<<<<< HEAD
                         success:function() {
                             by.app.fetchCurrentSong()
                             by.app.moreSongsHandler()
+=======
+                        success:function(xml) {
+
+>>>>>>> play spotify songs from app
                         }
                     })
-
+                    $('.play').live('click',function(){
+                      getUrl = $(this).attr('href')
+                      console.log(getUrl)
+                    })
+                    by.app.fetchCurrentSong()
                 })
             }
         }
