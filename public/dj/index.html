@@ -38,6 +38,7 @@
     }
     #song-message { height: 16px; margin-left: 100px;}
     #song-message span { color: green; display: none; font-size: 11px;}
+    .darktext { color: #bbb }
     header img{display:block;float:right;clear:right;margin-top:10px;margin-bottom:10px}
     header #main{float:left;margin-left:40px;}
     footer{margin-top:50px;border-top:1px solid #333;padding-top:25px}
@@ -238,8 +239,8 @@
                 },
                 djUser:{
                     djInit:function(){
+                      console.log('in djinit')
                         $('body').css({background:'#000',color:'#fff'})
-                        $('a').css('color','#bbb!')
                         $('#main').attr('src','/img/logo-inverted.jpg')
 
                         var modifyFam = .5,                        
@@ -249,6 +250,7 @@
                         modifyHot = .5                        
                         by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)
                         $('h3').text('Select a song to play')                                                
+                        setTimeout("$('.song-listing').addClass('darktext')",500)
                         setTimeout('setInterval("BY.app.updateChartVotes()", 6000)', 6000)
                     }
                 },
