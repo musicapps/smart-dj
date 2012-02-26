@@ -2,12 +2,19 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>MusicMonster.co</title>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+            <script type="text/javascript">
+
+
+        </script>
+
 </head>
 <body>
 
 
-<h1>Now playing : <strong>show song</strong></h1>
+<h1>Now playing : <strong></strong></h1>
 
 <style type="text/css">
     em {
@@ -15,8 +22,7 @@
     }
     .hide{display:none}
 </style>
-<script type="text/javascript" src=http://google.com/jsapi/></script>
-<script type="text/javascript">google.load('jquery', '1.7.1')</script>
+
 <script type="text/javascript" src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
 <script type="text/javascript">
 
@@ -28,7 +34,81 @@
 
             init: function() {
                 by.app.handleListeners.buttonInterface()
+                songHot = [],
+                songFam = [],
+                crowdHot = [],
+                crowdFam = []
 
+                by.app.visChart()
+
+            },
+            visChart:function(){
+                var chart;
+                $(document).ready(function() {
+                    // var baseArray = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
+
+
+
+                    chart = new Highcharts.Chart({
+                        chart: {
+                            renderTo: 'container',
+                            defaultSeriesType: 'line',
+                            marginRight: 130,
+                            marginBottom: 25
+                        },
+                        title: {
+                            text: 'Song Familiarity and Hotttness',
+                            x: -20 //center
+                        },
+                        subtitle: {
+                            text: 'Source: EchoNest.com',
+                            x: -20
+                        },
+                        xAxis: {
+                            // categories: ['Rock', 'Pop', 'HipHop', 'Punk', 'Ska', 'Metal',
+                            //      'Breaks', 'Trance', 'House', 'Oldies', 'Symphony', 'Jazz']
+                            categories: ['','','','','','','','','','','','']
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Song Hotttness'
+                            },
+                            plotLines: [{
+                                value: 0,
+                                width: 1,
+                                color: '#808080'
+                            }]
+                        },
+                        tooltip: {
+                            formatter: function() {
+                                    return '<b>'+ this.series.name +'</b><br/>'+
+                                    this.x +': '+ this.y +'°C';
+                            }
+                        },
+                        legend: {
+                            layout: 'vertical',
+                            align: 'right',
+                            verticalAlign: 'top',
+                            x: -10,
+                            y: 100,
+                            borderWidth: 0
+                        },
+                        series: [{
+                            name: 'Song Hotness',
+                            data: songHot
+                        }, {
+                            name: 'Song Familiarity',
+                            data: songFam
+                        }, {
+                            name: 'Crowd Hotness',
+                            data: crowdHot
+                        },{
+                            name: 'Crowd Familiarity',
+                            data: crowdFam
+                        }
+                        ]
+                    });
+                });                
             },
             populateUserUI: function(){
                 var userInterfaceTemplate = 'foo'
@@ -57,7 +137,16 @@
                 djUser:{
                     djInit:function(){
                         console.log('hide')
-                        by.app.showSongs()      
+                        var modifyMinFam = .5,
+                        modifyMaxFam = modifyMinFam + .1,
+                        modifyDesc = 'disco',
+                        modifyResults = 20,
+                        modifyStyle = '90s',
+                        modifyMinHot = .5,
+                        modifyMaxHot = modifyMinHot + .1
+                        by.app.showSongs(modifyStyle,modifyDesc,modifyMinFam,modifyResults,modifyMinHot)
+
+
                     }
                 },
                 listenUser:{
@@ -100,7 +189,7 @@
                     type:'GET',
                     success:function(data) {
 
-                        console.log(data)
+
 
                         $returnedSongId = data.song.echo_nest_song_id
 
@@ -115,6 +204,28 @@
                                 $('h1>strong').text(songTitle + ', ' + artistName)
                                 $('body').attr('data-echonestid',$returnedSongId)
 
+                                var artistId = data.response.songs[0].artist_id
+
+                                var url = 'http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=N6E4NIOVYMTHNDM8J&id=' + artistId + '&format=json',
+                                    urlFam = 'http://developer.echonest.com/api/v4/artist/familiarity?api_key=N6E4NIOVYMTHNDM8J&id=' + artistId + '&format=json'
+                                $.ajax({
+                                    url:url,
+                                    type:'GET',
+                                    success:function(data){
+                                        var thisHotness = data.response.artist.hotttnesss * 10
+                                        console.log(thisHotness)
+                                        songHot.push(thisHotness)
+                                        by.app.visChart()           
+                                    }
+                                })
+                                $.ajax({
+                                    url:urlFam,
+                                    type:'GET',
+                                    success:function(dat){
+                                        songFam.push(dat.response.artist.familiarity * 10)
+                                        by.app.visChart()           
+                                    }
+                                })
                             }
                         })
 
@@ -157,8 +268,18 @@
                     })
                 })
             },
-            showSongs:function() {
-                var url = 'http://developer.echonest.com/api/v4/playlist/static?api_key=N6E4NIOVYMTHNDM8J&description=90s&description=disco&type=artist-description&artist_min_familiarity=.7&sort=tempo-asc&results=20'
+            showSongs:function(modifyStyle,modifyDesc,modifyMinFam,modifyResults,modifyMinHot) {
+                var modifyMinFam = .5,
+                    modifyMaxFam = modifyMinFam + .1
+                    modifyDesc = 'disco',
+                    modifyResults = 20,
+                    modifyStyle = '90s',
+                    modifyMinHot = .5,
+                    modifyMaxHot = modifyMinHot + .1
+
+                var modifyFam = modifyFam
+
+                var url = 'http://developer.echonest.com/api/v4/playlist/static?api_key=N6E4NIOVYMTHNDM8J&description=' + modifyStyle + '&description=' + modifyDesc + '&type=artist-description&artist_min_familiarity=' + modifyMinFam + '&artist_max_familiarity=' + modifyMaxFam + '&sort=tempo-asc&results=' + modifyResults + '&artist_min_hotttnesss=' + modifyMinHot + '&artist_max_hotttnesss=' + modifyMaxHot + '&variety=.5'
                 $.ajax({
                     url:url,
                     type:'GET',
@@ -209,10 +330,20 @@
 </script>
 
 
+
+
+
+
+
+<script type="text/javascript" src="/javascripts/highcharts.js"></script>
+<script type="text/javascript" src="/javascripts/exporting.js"></script>
+
+<div id="container" style="width: 800px; height: 400px; margin: 0 auto"></div>
 <ul id=song-vote class=hide>
     <li><a class=vote-hot href="/">hotter</a></li>
     <li><a class=vote-same href="/">same</a></li>
     <li><a class=vote-familiar href="/">familiar</a></li>
 </ul>
+
 </body>
 </html>
