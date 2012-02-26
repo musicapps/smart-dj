@@ -326,7 +326,8 @@
                     })
                 }})
 
-                $('#loc a').live('click', function(e) {
+                var addUrl = 0
+                $('#loc a').live('click', function(e,addUrl) {
                     e.preventDefault()
                     $venueId = $(this).attr('class')
                     var url = 'https://api.foursquare.com/v2/checkins/add?venueId=' + $venueId + '&oauth_token=' + $token
@@ -359,7 +360,7 @@
                     success:function(dat) {
                         $(dat.response.songs).each(function() {
                             $('body').append('<ul id=dj-songs />')
-                            $('#dj-songs').append('<li><a data-songid=' + this.id + ' href=/ >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
+                            $('#dj-songs').append('<li><a data-songid=' + this.id + ' href=# >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
                         })
                     }
                 })
@@ -375,7 +376,29 @@
                 })
 
                 $('#dj-songs a').live('click', function(e) {
+
+                    var that = this
+                    // show song get id
+                    var queryVal = $(this).text()
+                    console.log(queryVal)
+                    var url = 'http://ws.spotify.com/search/1/track?q=' + queryVal
+                    console.log(url)
+                    $.ajax({
+                        url:url,
+                        type:'GET',
+                        dataType:'xml',
+                        success:function(data){
+                            console.log(data)
+                            console.log($(data).find('track').eq(0).attr('href'))
+                            $(that).attr('href',$(data).find('track').eq(0).attr('href'))
                     e.preventDefault()
+                            $(that).click()
+
+                        }
+                    })
+
+                    // $(this).attr('href','spotify:track:6PZDPg3dZgJkNL6nVMUB4b')
+
                     // songs/location/:songid/:authid
                     // songs/location/songid=123
                     var url = '/songs',
