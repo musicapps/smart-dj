@@ -36,6 +36,8 @@
     #song-vote a:hover{
       font-weight:normal
     }
+    #song-message { height: 16px; margin-left: 100px;}
+    #song-message span { color: green; display: none; font-size: 11px;}
     header img{display:block;float:right;clear:right;margin-top:10px;margin-bottom:10px}
     header #main{float:left;margin-left:40px;}
     footer{margin-top:50px;border-top:1px solid #333;padding-top:25px}
@@ -235,7 +237,7 @@
                 },
                 fetchSuccess:function(){
                     if(window.location.hash.indexOf('type=dj') === -1){
-                        $('#song-vote').show()
+                        $('#song-vote').show()                        
                         by.app.updateChartVotes()
                         setInterval('BY.app.fetchCurrentSong()', 5000)
                         setInterval("BY.app.updateChartVotes()", 6000) 
@@ -276,7 +278,8 @@
                       e.preventDefault()
                       var voteAttr = $(this).text()
                       by.app.handleListeners.feedback(voteAttr)
-
+                      $('#song-message span').show()
+                      $('#song-message span').fadeOut(8000)
                     })
                 }
             },            
@@ -473,7 +476,7 @@
     <li><a class=vote-familiar href="/">more familiar</a></li>
     <li><a class=vote-less-familiar href="/">less familiar</a></li>
 </ul>
-
+<div id="song-message"><span>Thank you for expressing your feelings...</span></div>
 <div id="container" style="width: 800px; height: 400px; margin: 0 auto; display:none;"></div>
 <button id='more-songs' class='hide'>suggest more songs</button>
 
