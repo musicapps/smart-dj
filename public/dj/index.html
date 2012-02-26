@@ -4,21 +4,58 @@
     <meta charset="UTF-8">
     <title>MusicMonster.co</title>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-</head>
-<body>
-
-
-<h1>Checkin to a location.</h1>
-
 <style type="text/css">
-    body{font:arial}
+    body{font-family:arial}
     em {
         margin-left: 20px
     }
     .hide{display:none}
-
+    a{text-decoration:none;color:#333}
+    a:hover{text-decoration:underline;font-weight:bold}
+    #wrap{width:980px;margin-left:auto;margin-right:auto;border:1px solid #333;padding:20px;overflow:auto}
+    li{list-style-type:none;margin:10px 0}
+    .play-track-btn{
+      background: url(/img/play-btn.jpg);
+      height: 18px;
+      width: 18px;
+      text-indent: -9999px;
+      display: inline-block;
+      margin-left: 10px;
+    }
+    #song-vote li{
+      display:inline-block
+    }
+    #song-vote a{
+      background:#333;
+      -webkit-border-radius:5px;
+      padding:10px;
+      color:#fff;
+      -webkit-box-shadow: 4px 4px 4px #333;
+      margin:0 5px;
+    }
+    #song-vote a:hover{
+      font-weight:normal
+    }
+    header img{display:block;float:right;clear:right;margin-right:80px;margin-top:10px;margin-bottom:10px}
+    header #main{float:left;margin-left:60px;margin-right:30px}
+    footer{margin-top:50px;border-top:1px solid #333;padding-top:25px}
 
 </style>
+
+</head>
+<body>
+  <header><h1>MonsterMusic.co</h1>
+<img id=main width=660 src=/img/logo.jpg />
+<img src="/img/60x50_dk.gif" alt="">
+<img height=50 src="/img/spotify_100.jpg" alt="">
+
+<img height=48 src="/img/poweredByFoursquare_gray.png" alt="" style="border:1px solid #000">
+  </header>
+<div id=wrap>
+
+<h3>Check-in below.</h3>
+
+
 
 <script type="text/javascript">
 
@@ -186,7 +223,7 @@
                         modifyStyle = '90s',
                         modifyHot = .5                        
                         by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)
-                        $('h1').text('Select a song to play')                                                
+                        $('h3').text('Select a song to play')                                                
                         setTimeout('setInterval("BY.app.updateChartVotes()", 6000)', 6000)
                     }
                 },
@@ -310,7 +347,7 @@
 
                 $.ajax({url:venueSearch,type:'GET',success:function(data) {
 
-                    $('body').append('<div id=loc />')
+                    
                     $(data.response.groups[0].items).each(function() {
                         $venueId = this.id
                         $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '</a></li>')
@@ -381,10 +418,13 @@
                             //$(that).attr('href',$(data).find('track').eq(0).attr('href'))
                             // console.log($(data).find('track').eq(0).attr('href'))
                             if ($(data).find('track').eq(0).attr('href')){
-                              alert('Song found on Spotify')
-                              console.log(that)
+
+                              console.log('check next')
                               var spotifyUrl = $(data).find('track').eq(0).attr('href')   
-                              $('<a class=play-track-btn href=' + spotifyUrl + ' >play</a>  ').insertBefore(that)
+                              console.log($(that).next().next())
+                              if (!$(that).next().next().length){
+                                $('<a class=play-track-btn href=' + spotifyUrl + ' >play</a>  ').insertAfter($(that).next())
+                              }
                             }
 
                         }
@@ -395,15 +435,8 @@
                     $.ajax({
                         url:url,
                         data: {song:{foursquare_venue_id: $venueId,dj_foursquare_id:$userFoursquareId,echo_nest_song_id:$echoNestSongId}},
-<<<<<<< HEAD
                         type:'POST',
-
                         success:function(xml) {
-
-=======
-                        type:'POST',                        
-                        success:function() {
->>>>>>> new changes
                         }
                     })
                     $('.play').live('click',function(){
@@ -427,10 +460,6 @@
 
 <script type="text/javascript" src="/javascripts/highcharts.js"></script>
 <script type="text/javascript" src="/javascripts/exporting.js"></script>
-
-<div id="container" style="width: 800px; height: 400px; margin: 0 auto; display:none;"></div>
-<button id='more-songs' class='hide'>suggest more songs</button>
-<ul id='dj-songs'></ul>
 <ul id='song-vote' class='hide'>
     <li><a class=vote-less-hot href="/">less hot</a></li>
     <li><a class=vote-hot href="/">more hot</a></li>
@@ -439,5 +468,13 @@
     <li><a class=vote-less-familiar href="/">less familiar</a></li>
 </ul>
 
+<div id="container" style="width: 800px; height: 400px; margin: 0 auto; display:none;"></div>
+<button id='more-songs' class='hide'>suggest more songs</button>
+
+
+<ul id='dj-songs'></ul>
+<div id="loc"></div>
+<footer>Copyright &copy; 2012 MonsterMusic.co </footer>
+</div>
 </body>
 </html>
