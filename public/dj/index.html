@@ -11,10 +11,12 @@
 <h1>Now playing : <strong></strong></h1>
 
 <style type="text/css">
+    body{font:arial}
     em {
         margin-left: 20px
     }
     .hide{display:none}
+
 
 </style>
 
@@ -408,14 +410,9 @@
                         url:url,
                         data: {song:{foursquare_venue_id: $venueId,dj_foursquare_id:$userFoursquareId,echo_nest_song_id:$echoNestSongId}},
                         type:'POST',
-<<<<<<< HEAD
-                        success:function() {
-                            by.app.fetchCurrentSong()
-                            by.app.moreSongsHandler()
-=======
+
                         success:function(xml) {
 
->>>>>>> play spotify songs from app
                         }
                     })
                     $('.play').live('click',function(){
