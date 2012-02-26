@@ -74,8 +74,28 @@
                 crowdFam = []
 
                 by.app.visChart()
+            },
+            autoPlay:{
+              init:function(){
+                if (!$('#auto').length){
+                  $('<button id="auto">auto play</button>').insertAfter('#more-songs')           
+                  $('#auto').bind('click',function(){
+                    by.app.autoPlay.startPlay()
+                  })
+              }
 
             },
+              startPlay:function(){
+                
+                  setInterval('BY.app.autoPlay.loopPlay()',20000)
+
+            },
+            loopPlay:function(){
+                  BY.app.getMoreSongs()
+                  setTimeout("$('.song-listing').eq(0).click()",1500)
+
+            }
+          },
             updateChartVotes:function(){
               // race condition if no songs added yet.
               if (songHot.length && songFam.length){                
@@ -220,6 +240,7 @@
                     djInit:function(){
                         $('body').css({background:'#000',color:'#fff'})
                         $('#main').attr('src','/img/logo-inverted.jpg')
+
                         var modifyFam = .5,                        
                         modifyDesc = 'disco',
                         modifyResults = 20,
@@ -248,6 +269,7 @@
             },
             moreSongsHandler:function(){              
               $('#more-songs').show()
+              by.app.autoPlay.init()
               $('#more-songs').on('click',function(){
                 by.app.getMoreSongs()
                 $('#more-songs').attr('disabled',true)             
