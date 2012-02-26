@@ -10,14 +10,18 @@
     var client_id;
     var callback_url;
 
-    if (window.location.hostname == 'localhost'){
+    if (window.location.hostname == 'musicmonster.heroku.com'){
+      client_id = 'UVKGGMHGHZCUTLNRE5ZBWTNBWCAORIBRKS3MEP2X5JR01VOI';
+      callback_url = 'http://musicmonster.heroku.com/dj/';
+    } else if (window.location.hostname == 'localhost'){
       client_id = '2OB4DOBLUWR5IM0X1A2OYN05Y221ECGJYOMQ3FF0ZIUCZWPF';
-      callback_url = 'http://localhost:3000/songs';
-                  
+      callback_url = 'http://localhost:3000/songs';                  
     } else if (window.location.hostname == '173.204.223.122') {
       client_id = 'VKE4SB1HXZZ4DKLLMVXKOZDZMEN1B5MKQ4OGJ3CNKLLAHQOS';
       callback_url = 'http://173.204.223.122/songs';      
     }
+
+
 
     /* Attempt to retrieve access token from URL. */
     if ($.bbq.getState('access_token')) {
