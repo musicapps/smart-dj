@@ -39,7 +39,6 @@
     header img{display:block;float:right;clear:right;margin-right:80px;margin-top:10px;margin-bottom:10px}
     header #main{float:left;margin-left:40px;}
     footer{margin-top:50px;border-top:1px solid #333;padding-top:25px}
-
 </style>
 
 </head>
@@ -168,7 +167,7 @@
                         },
                         yAxis: {
                             title: {
-                                text: 'Song Hotttness'
+                                text: 'Rating'
                             },
                             plotLines: [{
                                 value: 0,
@@ -302,6 +301,7 @@
   
                                   $('h3').text('Now Playing: ' + songTitle + ', ' + artistName)                                  
                                   $('body').attr('data-echonestid',$returnedSongId)
+                                  $('<p>Use these buttons to below to express how you feel about the music!</p>').insertAfter('h3')
   
                                   var artistId = data.response.songs[0].artist_id
                                   var songId = data.response.songs[0].id
