@@ -300,7 +300,7 @@
                                   var songTitle = data.response.songs[0].title,
                                           artistName = data.response.songs[0].artist_name
   
-                                  $('h1').text('Now Playing: ' + songTitle + ', ' + artistName)                                  
+                                  $('h3').text('Now Playing: ' + songTitle + ', ' + artistName)                                  
                                   $('body').attr('data-echonestid',$returnedSongId)
   
                                   var artistId = data.response.songs[0].artist_id
