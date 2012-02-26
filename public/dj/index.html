@@ -89,6 +89,8 @@
                     if (cHotOrig === cHotNew){                      
                       crowdHot.push(cHotOrig)
                     } else{
+                      if (cHotNew > 10) { cHotNew=10 }
+                      if (cHotNew < 0) { cHotNew = 0 }
                       crowdHot.push(cHotNew)
                       chart_dirty=true
                     }
@@ -97,6 +99,8 @@
                     if (cFamOrig === cFamNew){                      
                       crowdFam.push(cFamOrig)
                     } else{
+                      if (cFamNew > 10) { cFamNew=10 }
+                      if (cFamNew < 0) { cFamNew=0 }                     
                       crowdFam.push(cFamNew)
                       chart_dirty=true
                     }
@@ -207,7 +211,8 @@
                         modifyStyle = '90s',
                         modifyHot = .5
                         by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)
-
+                        
+                        setTimeout('setInterval("BY.app.updateChartVotes()", 3000)', 4000)
                     }
                 },
                 listenUser:{
@@ -215,8 +220,8 @@
                         console.log('start listening') 
                         $('#song-vote').show()
                         //by.app.fetchCurrentSong() 
-                        setInterval('BY.app.fetchCurrentSong()', 5000)
-                        setTimeout('setInterval("BY.app.updateChartVotes()", 3000)', 8000) 
+                        setInterval('BY.app.fetchCurrentSong()', 2500)
+                        setTimeout('setInterval("BY.app.updateChartVotes()", 3000)', 4000) 
                     }
                 }
             },
@@ -308,7 +313,6 @@
 
                 var venueSearch = 'https://api.foursquare.com/v2/venues/search?ll=40.740648,-73.98689&oauth_token=' + $token
 
-
                 $.ajax({url:venueSearch,type:'GET',success:function(data) {
 
                     $(data.response.groups[0].items).each(function() {
@@ -317,10 +321,8 @@
                         $('body').append('<div id=loc />')
                         $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '</a></li>')
 
-
                     })
                 }})
-
 
                 $('#loc a').live('click', function(e) {
                     e.preventDefault()
@@ -397,10 +399,6 @@
 
 
 </script>
-
-
-
-
 
 
 
