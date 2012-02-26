@@ -9,7 +9,7 @@ gem 'sqlite3'
 
 
 group :production do
-  gem 'activerecord-postgresql-adapter'
+  gem 'pg'
 end
 
 # Gems used only for assets and not required
