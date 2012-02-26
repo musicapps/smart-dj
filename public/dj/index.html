@@ -249,8 +249,7 @@
                         modifyStyle = '90s',
                         modifyHot = .5                        
                         by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)
-                        $('h3').text('Select a song to play')                                                
-                        setTimeout("$('.song-listing').addClass('darktext')",500)
+                        $('h3').text('Select a song to play')                                                                        
                         setTimeout('setInterval("BY.app.updateChartVotes()", 6000)', 6000)
                     }
                 },
@@ -418,7 +417,7 @@
                     success:function(dat) {
                         $('#dj-songs').empty()
                         $(dat.response.songs).each(function() {
-                            $('#dj-songs').append('<li><a class=song-listing data-songid=' + this.id + ' href=# >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
+                            $('#dj-songs').append('<li><a class="song-listing darktext" data-songid=' + this.id + ' href=# >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
                         })
                     }
                 })
