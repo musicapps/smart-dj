@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <title>MusicMonster.co</title>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-
-            <script type="text/javascript">
-
-
-        </script>
-
 </head>
 <body>
 
@@ -25,7 +19,6 @@
 
 <script type="text/javascript" src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
 <script type="text/javascript">
-
 
     BY = (function() {
 
@@ -177,7 +170,7 @@
                             data: crowdFam
                         }
                         ]
-                    });
+                    });                    
                 });                
             },
             populateUserUI: function(){
@@ -212,8 +205,7 @@
                         modifyResults = 20,
                         modifyStyle = '90s',
                         modifyHot = .5
-                        by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)
-                        
+                        by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)                        
                         setTimeout('setInterval("BY.app.updateChartVotes()", 3000)', 6000)
                     }
                 },
@@ -226,6 +218,16 @@
                         setInterval("BY.app.updateChartVotes()", 6000) 
                     }
                 }
+            },
+            moreSongsHandler:function(){
+              $('body').append('<button id=more-songs>suggest more songs</button>')
+              $('#more-songs').live('click',function(){
+                cFam=crowdFam.pop()
+                crowdFam.push(cFam)
+                cHot=crowdHot.pop()
+                crowdHot.push(cHot)
+                by.app.showSongs('modifyStyle','modifyDesc',cFam/10.0,'modifyResults',cHot/10.0)
+              })
             },
             handleListeners:{
                 feedback:function(voteAttr){
@@ -337,9 +339,8 @@
                         success:function(dat) {
                             $('body').attr('data-venueid', $venueId)
                             $('#loc li').hide()
-
                             by.app.accomodateUser.selectUser()
-
+                            $('#container').show()
                         }
                     })
                 })
@@ -357,10 +358,10 @@
                 $.ajax({
                     url:url,
                     type:'GET',
-                    success:function(dat) {
-                        $(dat.response.songs).each(function() {
-                            $('body').append('<ul id=dj-songs />')
-                            $('#dj-songs').append('<li><a data-songid=' + this.id + ' href=# >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
+                    success:function(dat) {                        
+                        $('#dj-songs').empty()
+                        $(dat.response.songs).each(function() {            
+                          $('#dj-songs').append('<li><a data-songid=' + this.id + ' href=/ >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
                         })
                     }
                 })
@@ -409,6 +410,7 @@
                         type:'POST',
                         success:function() {
                             by.app.fetchCurrentSong()
+                            by.app.moreSongsHandler()
                         }
                     })
 
@@ -430,8 +432,9 @@
 <script type="text/javascript" src="/javascripts/highcharts.js"></script>
 <script type="text/javascript" src="/javascripts/exporting.js"></script>
 
-<div id="container" style="width: 800px; height: 400px; margin: 0 auto"></div>
-<ul id=song-vote class=hide>
+<div id="container" style="width: 800px; height: 400px; margin: 0 auto; display:none;"></div>
+<ul id='dj-songs'></ul>
+<ul id='song-vote' class='hide'>
     <li><a class=vote-less-hot href="/">less hot</a></li>
     <li><a class=vote-hot href="/">more hot</a></li>
     <li><a class=vote-same href="/">same</a></li>
