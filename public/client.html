@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+    <html lang="en-US">
+        <head>
+            <meta charset="UTF-8">
+                <title></title>
+            </head>
+            <body>
+
+                <script type="text/javascript" src="http://google.com/jsapi/"></script>
+                <script type="text/javascript">google.load('jquery','1.7.1')</script>
+
+                <script type="text/javascript">
+
+
+                BY = (function(){
+
+                    var by = []
+                    by.app = {
+
+                init:function(){
+                    by.app.methodOne()
+                    },
+                methodOne: function(){
+                    console.log('foo')
+
+                    }
+
+                }
+
+                by.app.init()
+                return by
+
+
+                }())
+
+                </script>
+
+            </body>
+        </html>

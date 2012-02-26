@@ -1,148 +1,191 @@
 <!DOCTYPE HTML>
 <html lang="en-US">
 <head>
-	<meta charset="UTF-8">
-	<title></title>
+    <meta charset="UTF-8">
+    <title></title>
 </head>
 <body>
 
 
-	<h1>Now playing : <strong>show song</strong> </h1>
-	choose currently playing song
+<h1>Now playing : <strong>show song</strong></h1>
+
 <style type="text/css">
-	em{margin-left:20px}
+    em {
+        margin-left: 20px
+    }
 </style>
 <script type="text/javascript" src=http://google.com/jsapi/></script>
-<script type="text/javascript">google.load('jquery','1.7.1')</script>
+<script type="text/javascript">google.load('jquery', '1.7.1')</script>
+<script type="text/javascript" src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
 <script type="text/javascript">
 
 
+    BY = (function() {
 
-BY = (function() {
+        var by = []
+        by.app = {
 
-    var by = []
-    by.app = {
+            init: function() {
+                by.app.showSongs()
+                by.app.handleListeners.buttonInterface()
+            },
+            populateUserUI: function(){
+                var userInterfaceTemplate = 'foo'
+                $('body').append('<div id=user-ui />')
+                $('#user-ui').append(userInterfaceTemplate)
 
-        init: function(){
-        	by.app.showSongs()
-        	by.app.fetchCurrentSong()
-        },
-        fetchCurrentSong:function(){
+                var view = {    
+                  familiarity:'val',
+                  hotttness:'val2'
+                  }
 
-        	$venueId = '4e6616838877954de9b79ab8'
-        	$returnedSongId = 'SOOSHQA1315CD49B9B'
-        	var defUrl = '/songs/' + $venueId
-        	$.ajax({
-        		url:defUrl,
-        		type:'GET',
-        		success:function(data){
+                var output = Mustache.render("<label>song familiarity</label> <input value={{familiarity}}> <label>hotness</label><input value={{hotttness}}>", view);
+                $('body').append(output)
 
-        			$returnedSongId = data.song.echo_nest_song_id
-        			console.log(currentSongEchoId)
-        			var newUrl = 'http://developer.echonest.com/api/v4/song/profile?api_key=N6E4NIOVYMTHNDM8J&format=json&id=' + $returnedSongId
-        			$.ajax({
-        				url:newUrl,
-        				type:'GET',
-        				success:function(data){
-        					var songTitle = data.response.songs[0].title,
-        						artistName = data.response.songs[0].artist_name
+                                                
+            },
+            handleListeners:{
+                feedback:function(voteAttr){
+                    var url = '/feedback',
+                        $echoNestSong = $('body').attr('data-echonestid'),
+                        $fourSquareVenue = $('body').attr('data-venueid'),
+                        $fourSquareListener = $('body').attr('data-foursqid')
 
-        						$('h1>strong').text(songTitle + ', ' + artistName)
+                    $.ajax({
+                      url:url,
+                      data: {feedback:{echo_nest_song_id: $echoNestSong, foursquare_venue_id: $fourSquareVenue, listener_foursquare_id: $fourSquareListener, vote_attribute: voteAttr}},
+                      type:'POST'
+                    });     
+                },
+                buttonInterface:function(){
+                    console.log('btn int')
+                    $('#song-vote a').live('click',function(e){
+                      e.preventDefault()
+                      var voteAttr = $(this).text()
+                      by.app.handleListeners.feedback(voteAttr)
+                    })
+                }
+            },
+            fetchCurrentSong:function() {
 
-        				}
-        			})
-
-        		}
-        	})
-        },
-        fetchToken:function() {
-            $token = window.location.hash.split('=')[1]
-            // console.log($token)
-
-            var venueSearch = 'https://api.foursquare.com/v2/venues/search?ll=40.740648,-73.98689&oauth_token=' + $token
-
-
-            $.ajax({url:venueSearch,type:'GET',success:function(data) {
-
-                $(data.response.groups[0].items).each(function() {
-                    $venueId = this.id
-
-                    $('body').append('<div id=loc />')
-                    $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '</a><br/>' + this.id + '</li>')
-
-
-                })
-            }})
-
-
-            $('#loc a').live('click', function(e) {
-                e.preventDefault()
-				$venueId = $(this).attr('class')
-                var url = 'https://api.foursquare.com/v2/checkins/add?venueId=' + $venueId + '&oauth_token=' + $token
+                // $venueId = '4e6616838877954de9b79ab8'
+                // $returnedSongId = 'SOOSHQA1315CD49B9B'
+                var defUrl = '/songs/' + $('body').attr('data-venueid')
                 $.ajax({
-                    url:url,
-                    type:'POST',
-                    success:function(dat) {
-                        // console.log(dat)
+                    url:defUrl,
+                    type:'GET',
+                    success:function(data) {
+
+                        console.log(data)
+
+                        $returnedSongId = data.song.echo_nest_song_id
+
+                        var newUrl = 'http://developer.echonest.com/api/v4/song/profile?api_key=N6E4NIOVYMTHNDM8J&format=json&id=' + $returnedSongId
+                        $.ajax({
+                            url:newUrl,
+                            type:'GET',
+                            success:function(data) {
+                                var songTitle = data.response.songs[0].title,
+                                        artistName = data.response.songs[0].artist_name
+
+                                $('h1>strong').text(songTitle + ', ' + artistName)
+                                $('body').attr('data-echonestid',$returnedSongId)
+
+                            }
+                        })
+
                     }
                 })
-            })
-        },
-        showSongs:function(){
-			var url = 'http://developer.echonest.com/api/v4/playlist/static?api_key=N6E4NIOVYMTHNDM8J&description=90s&description=disco&type=artist-description&artist_min_familiarity=.7&sort=tempo-asc&results=20'
-			$.ajax({
-				url:url,
-				type:'GET',
-				success:function(dat){
-					$(dat.response.songs).each(function(){
+            },
+            fetchToken:function() {
+                $token = window.location.hash.split('=')[1]
 
-						$('body').append('<li><a data-songid=' + this.id + ' href=/ >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
-					})
-				}
-			})        	
+                var venueSearch = 'https://api.foursquare.com/v2/venues/search?ll=40.740648,-73.98689&oauth_token=' + $token
 
-var getUserObjUrl = 'https://api.foursquare.com/v2/users/self?oauth_token=' + $token + '&v=20120225'
-$.ajax({
-	url:getUserObjUrl,
-	type:'GET',
-	success:function(data){
-		$userFoursquareId = data.response.user.id
-	}
-})
 
-			$('a').live('click', function(e){
-				e.preventDefault()
-				// songs/location/:songid/:authid
-				// songs/location/songid=123
-				var url = '/songs',
-					$echoNestSongId = $(this).attr('data-songid')
-				$.ajax({
-					url:url,
-					data: {song:{foursquare_venue_id: $venueId,dj_foursquare_id:$userFoursquareId,echo_nest_song_id:$echoNestSongId}},
-					type:'POST'
-				})
-			})
+                $.ajax({url:venueSearch,type:'GET',success:function(data) {
+
+                    $(data.response.groups[0].items).each(function() {
+                        $venueId = this.id
+
+                        $('body').append('<div id=loc />')
+                        $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '</a><br/>' + this.id + '</li>')
+
+
+                    })
+                }})
+
+
+                $('#loc a').live('click', function(e) {
+                    e.preventDefault()
+                    $venueId = $(this).attr('class')
+                    var url = 'https://api.foursquare.com/v2/checkins/add?venueId=' + $venueId + '&oauth_token=' + $token
+                    $.ajax({
+                        url:url,
+                        type:'POST',
+                        success:function(dat) {
+                            $('body').attr('data-venueid', $venueId)
+                            $('#loc li').hide()
+                        }
+                    })
+                })
+            },
+            showSongs:function() {
+                var url = 'http://developer.echonest.com/api/v4/playlist/static?api_key=N6E4NIOVYMTHNDM8J&description=90s&description=disco&type=artist-description&artist_min_familiarity=.7&sort=tempo-asc&results=20'
+                $.ajax({
+                    url:url,
+                    type:'GET',
+                    success:function(dat) {
+                        $(dat.response.songs).each(function() {
+                            $('body').append('<ul id=dj-songs />')
+                            $('#dj-songs').append('<li><a data-songid=' + this.id + ' href=/ >' + this.title + '</a><em>' + this.artist_name + '</em></li>')
+                        })
+                    }
+                })
+
+                var getUserObjUrl = 'https://api.foursquare.com/v2/users/self?oauth_token=' + $token + '&v=20120225'
+                $.ajax({
+                    url:getUserObjUrl,
+                    type:'GET',
+                    success:function(data) {
+                        $userFoursquareId = data.response.user.id
+                        $('body').attr('data-foursqid',$userFoursquareId)
+                    }
+                })
+
+                $('#dj-songs a').live('click', function(e) {
+                    e.preventDefault()
+                    // songs/location/:songid/:authid
+                    // songs/location/songid=123
+                    var url = '/songs',
+                            $echoNestSongId = $(this).attr('data-songid')
+                    $.ajax({
+                        url:url,
+                        data: {song:{foursquare_venue_id: $venueId,dj_foursquare_id:$userFoursquareId,echo_nest_song_id:$echoNestSongId}},
+                        type:'POST',
+                        success:function() {
+                            by.app.fetchCurrentSong()
+                        }
+                    })
+
+                })
+            }
         }
-    }
-    by.app.fetchToken()
-    by.app.init()
-    return by
+        by.app.fetchToken()
+        by.app.init()
+        return by
 
 
-}())
-
+    }())
 
 
 </script>
 
 
-<!--
-artist_id: "ARXFB7K1187B9B1E54"
-artist_name: "Missy Elliott"
-id: "SOZYXZU12A6D4FD303"
-title: "Get Ur Freak On (Amended LP Version)"
-__proto__: Object
--->
-
+<ul id=song-vote>
+    <li><a class=vote-hot href="/">hotter</a></li>
+    <li><a class=vote-same href="/">same</a></li>
+    <li><a class=vote-familiar href="/">familiar</a></li>
+</ul>
 </body>
 </html>
