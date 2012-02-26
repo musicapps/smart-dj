@@ -8,7 +8,7 @@
 <body>
 
 
-<h1>Now playing : <strong></strong></h1>
+<h1>Checkin to a location.</h1>
 
 <style type="text/css">
     body{font:arial}
@@ -20,7 +20,6 @@
 
 </style>
 
-<script type="text/javascript" src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
 <script type="text/javascript">
 
     BY = (function() {
@@ -54,19 +53,18 @@
                       
                       chart_dirty=false
                       
-                      sHot=songHot.pop()
-                      songHot.push(sHot)
-                      sFam=songFam.pop()
-                      songFam.push(sFam)
-                      
+                      sHot=songHot[songHot.length-1]
+                      sFam=songFam[songFam.length-1]
+                                            
                       cHotNew=sHot
                       cFamNew=sFam
-                                        
+                      
                       $(songIds).each(function(){
                         sid=this
                         $(dat.feedback).each(function(){
                           feedback_song_id=songs[this.song_id]                                                
-                           if ( feedback_song_id == sid ){
+                           if ( feedback_song_id == sid && sid == songIds[songIds.length-1]){
+                             console.log('found match')
                              if (this.vote_attribute === 'more hot'){
                                cHotNew=cHotNew+0.25
                              } else if (this.vote_attribute === 'less hot') {
@@ -82,27 +80,24 @@
                       })
                       
                       // detect if anything changed
-                      cHotOrig=crowdHot.pop()
-                      if (cHotOrig === cHotNew){                      
-                        crowdHot.push(cHotOrig)
-                      } else{
+                      cHotOrig=crowdHot[crowdHot.length-1]
+                      if (cHotOrig != cHotNew){
                         if (cHotNew > 10) { cHotNew=10 }
                         if (cHotNew < 0) { cHotNew = 0 }
-                        crowdHot.push(cHotNew)
+                        crowdHot[crowdHot.length-1]=cHotNew
                         chart_dirty=true
                       }
                       
-                      cFamOrig=crowdFam.pop()
-                      if (cFamOrig === cFamNew){                      
-                        crowdFam.push(cFamOrig)
-                      } else{
+                      cFamOrig=crowdFam[crowdFam.length-1]
+                      if (cFamOrig != cFamNew){                      
                         if (cFamNew > 10) { cFamNew=10 }
                         if (cFamNew < 0) { cFamNew=0 }                     
-                        crowdFam.push(cFamNew)
+                        crowdFam[crowdFam.length-1]=cFamNew
                         chart_dirty=true
                       }                                        
                       
-                      if (chart_dirty){                      
+                      if (chart_dirty){
+                        $('#more-songs').attr('disabled',false)                      
                         by.app.visChart()
                       }                               
                     }
@@ -175,24 +170,8 @@
                     });                    
                 });                
             },
-            populateUserUI: function(){
-                var userInterfaceTemplate = 'foo'
-                $('body').append('<div id=user-ui />')
-                $('#user-ui').append(userInterfaceTemplate)
-
-                var view = {    
-                  familiarity:'val',
-                  hotttness:'val2'
-                  }
-
-                var output = Mustache.render("<label>song familiarity</label> <input value={{familiarity}}> <label>hotness</label><input value={{hotttness}}>", view);
-                $('body').append(output)
-
-                                                
-            },
             accomodateUser:{
                 selectUser:function(){
-                    console.log()
                     if(window.location.hash.indexOf('type=dj') === -1){
                         by.app.accomodateUser.listenUser.listenerInit()
                     } else {
@@ -201,35 +180,45 @@
                 },
                 djUser:{
                     djInit:function(){
-                        console.log('hide')
                         var modifyFam = .5,                        
                         modifyDesc = 'disco',
                         modifyResults = 20,
                         modifyStyle = '90s',
-                        modifyHot = .5
-                        by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)                        
-                        setTimeout('setInterval("BY.app.updateChartVotes()", 3000)', 6000)
+                        modifyHot = .5                        
+                        by.app.showSongs(modifyStyle,modifyDesc,modifyFam,modifyResults,modifyHot)
+                        $('h1').text('Select a song to play')                                                
+                        setTimeout('setInterval("BY.app.updateChartVotes()", 6000)', 6000)
                     }
                 },
                 listenUser:{
                     listenerInit:function(){
-                        console.log('start listening') 
-                        $('#song-vote').show()
                         by.app.fetchCurrentSong() 
+                    }
+                },
+                fetchSuccess:function(){
+                    if(window.location.hash.indexOf('type=dj') === -1){
+                        $('#song-vote').show()
+                        by.app.updateChartVotes()
                         setInterval('BY.app.fetchCurrentSong()', 5000)
                         setInterval("BY.app.updateChartVotes()", 6000) 
-                    }
+                    } else{
+                      by.app.moreSongsHandler()
+                    }                  
                 }
             },
-            moreSongsHandler:function(){
-              $('body').append('<button id=more-songs>suggest more songs</button>')
-              $('#more-songs').live('click',function(){
-                cFam=crowdFam.pop()
-                crowdFam.push(cFam)
-                cHot=crowdHot.pop()
-                crowdHot.push(cHot)
-                by.app.showSongs('modifyStyle','modifyDesc',cFam/10.0,'modifyResults',cHot/10.0)
+            moreSongsHandler:function(){              
+              $('#more-songs').show()
+              $('#more-songs').on('click',function(){
+                by.app.getMoreSongs()
+                $('#more-songs').attr('disabled',true)             
               })
+            },           
+            getMoreSongs:function(){
+              cFam=crowdFam.pop()
+              crowdFam.push(cFam)
+              cHot=crowdHot.pop()
+              crowdHot.push(cHot)
+              by.app.showSongs('modifyStyle','modifyDesc',cFam/10.0,'modifyResults',cHot/10.0)              
             },
             handleListeners:{
                 feedback:function(voteAttr){
@@ -244,8 +233,7 @@
                       type:'POST'
                     });     
                 },
-                buttonInterface:function(){
-                    console.log('btn int')
+                buttonInterface:function(){                    
                     $('#song-vote a').live('click',function(e){
                       e.preventDefault()
                       var voteAttr = $(this).text()
@@ -262,7 +250,7 @@
                     url:defUrl,
                     type:'GET',
                     success:function(data) {
-
+                        $('#container').show()
                         $returnedSongId = data.song.echo_nest_song_id
 
                         if (!$('body').attr('data-echonestid') || !($('body').attr('data-echonestid') == $returnedSongId) ){ 
@@ -275,7 +263,7 @@
                                   var songTitle = data.response.songs[0].title,
                                           artistName = data.response.songs[0].artist_name
   
-                                  $('h1>strong').text(songTitle + ', ' + artistName)
+                                  $('h1').text('Now Playing: ' + songTitle + ', ' + artistName)                                  
                                   $('body').attr('data-echonestid',$returnedSongId)
   
                                   var artistId = data.response.songs[0].artist_id
@@ -289,8 +277,7 @@
                                       url:url,
                                       type:'GET',
                                       success:function(data){
-                                          var thisHotness = data.response.artist.hotttnesss * 10
-                                          console.log(thisHotness)
+                                          var thisHotness = data.response.artist.hotttnesss * 10                                          
                                           songHot.push(thisHotness)
                                           crowdHot.push(thisHotness)
                                           by.app.visChart()                                                    
@@ -306,13 +293,15 @@
                                       }
                                   })
                                                                     
-                                  
+                                  by.app.accomodateUser.fetchSuccess()
                                   
                               }
                           })
                       }
                     }
-                })
+                }).fail(function(){
+                    $('h1').text('There is no DJ at this venue.  Maybe someone will be here soon.')                    
+                  })
             },
             fetchToken:function() {
                 $token = window.location.hash.split('=')[1]
@@ -321,12 +310,10 @@
 
                 $.ajax({url:venueSearch,type:'GET',success:function(data) {
 
+                    $('body').append('<div id=loc />')
                     $(data.response.groups[0].items).each(function() {
                         $venueId = this.id
-
-                        $('body').append('<div id=loc />')
                         $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '</a></li>')
-
                     })
                 }})
 
@@ -341,8 +328,7 @@
                         success:function(dat) {
                             $('body').attr('data-venueid', $venueId)
                             $('#loc li').hide()
-                            by.app.accomodateUser.selectUser()
-                            $('#container').show()
+                            by.app.accomodateUser.selectUser()                            
                         }
                     })
                 })
@@ -356,7 +342,7 @@
                     modifyMinHot = modifyHot - .1,
                     modifyMaxHot = modifyHot + .1
 
-                var url = 'http://developer.echonest.com/api/v4/playlist/static?api_key=N6E4NIOVYMTHNDM8J&description=' + modifyStyle + '&description=' + modifyDesc + '&type=artist-description&artist_min_familiarity=' + modifyMinFam + '&artist_max_familiarity=' + modifyMaxFam + '&sort=tempo-asc&results=' + modifyResults + '&artist_min_hotttnesss=' + modifyMinHot + '&artist_max_hotttnesss=' + modifyMaxHot + '&variety=.5'
+                var url = 'http://developer.echonest.com/api/v4/playlist/static?api_key=N6E4NIOVYMTHNDM8J&description=' + modifyStyle + '&description=' + modifyDesc + '&type=artist-description&artist_min_familiarity=' + modifyMinFam + '&artist_max_familiarity=' + modifyMaxFam + '&sort=tempo-asc&results=' + modifyResults + '&artist_min_hotttnesss=' + modifyMinHot + '&artist_max_hotttnesss=' + modifyMaxHot + '&variety=.5'                
                 $.ajax({
                     url:url,
                     type:'GET',
@@ -405,14 +391,19 @@
                     })
 
                     var url = '/songs',
-                            $echoNestSongId = $(this).attr('data-songid')
+                    $echoNestSongId = $(this).attr('data-songid')
                     $.ajax({
                         url:url,
                         data: {song:{foursquare_venue_id: $venueId,dj_foursquare_id:$userFoursquareId,echo_nest_song_id:$echoNestSongId}},
+<<<<<<< HEAD
                         type:'POST',
 
                         success:function(xml) {
 
+=======
+                        type:'POST',                        
+                        success:function() {
+>>>>>>> new changes
                         }
                     })
                     $('.play').live('click',function(){
@@ -427,7 +418,6 @@
         by.app.init()
         return by
 
-
     }())
 
 
@@ -439,6 +429,7 @@
 <script type="text/javascript" src="/javascripts/exporting.js"></script>
 
 <div id="container" style="width: 800px; height: 400px; margin: 0 auto; display:none;"></div>
+<button id='more-songs' class='hide'>suggest more songs</button>
 <ul id='dj-songs'></ul>
 <ul id='song-vote' class='hide'>
     <li><a class=vote-less-hot href="/">less hot</a></li>
