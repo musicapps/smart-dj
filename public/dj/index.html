@@ -13,6 +13,7 @@
     em {
         margin-left: 20px
     }
+    .hide{display:none}
 </style>
 <script type="text/javascript" src=http://google.com/jsapi/></script>
 <script type="text/javascript">google.load('jquery', '1.7.1')</script>
@@ -26,8 +27,8 @@
         by.app = {
 
             init: function() {
-                by.app.showSongs()
                 by.app.handleListeners.buttonInterface()
+
             },
             populateUserUI: function(){
                 var userInterfaceTemplate = 'foo'
@@ -43,6 +44,29 @@
                 $('body').append(output)
 
                                                 
+            },
+            accomodateUser:{
+                selectUser:function(){
+                    console.log()
+                    if(window.location.hash.indexOf('type=dj') === -1){
+                        by.app.accomodateUser.listenUser.listenerInit()
+                    } else {
+                        by.app.accomodateUser.djUser.djInit()
+                    }
+                },
+                djUser:{
+                    djInit:function(){
+                        console.log('hide')
+                        by.app.showSongs()      
+                    }
+                },
+                listenUser:{
+                    listenerInit:function(){
+                        console.log('start listening') 
+                        $('#song-vote').show() 
+                        setInterval('BY.app.fetchCurrentSong()', 2000) 
+                    }
+                }
             },
             handleListeners:{
                 feedback:function(voteAttr){
@@ -109,7 +133,7 @@
                         $venueId = this.id
 
                         $('body').append('<div id=loc />')
-                        $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '</a><br/>' + this.id + '</li>')
+                        $('#loc').append('<li><a class=' + this.id + ' href=/ >' + this.name + '</a></li>')
 
 
                     })
@@ -126,6 +150,9 @@
                         success:function(dat) {
                             $('body').attr('data-venueid', $venueId)
                             $('#loc li').hide()
+
+                            by.app.accomodateUser.selectUser()
+
                         }
                     })
                 })
@@ -182,7 +209,7 @@
 </script>
 
 
-<ul id=song-vote>
+<ul id=song-vote class=hide>
     <li><a class=vote-hot href="/">hotter</a></li>
     <li><a class=vote-same href="/">same</a></li>
     <li><a class=vote-familiar href="/">familiar</a></li>
