@@ -36,7 +36,7 @@
     #song-vote a:hover{
       font-weight:normal
     }
-    header img{display:block;float:right;clear:right;margin-right:80px;margin-top:10px;margin-bottom:10px}
+    header img{display:block;float:right;clear:right;margin-top:10px;margin-bottom:10px}
     header #main{float:left;margin-left:40px;}
     footer{margin-top:50px;border-top:1px solid #333;padding-top:25px}
 </style>
@@ -216,6 +216,8 @@
                 },
                 djUser:{
                     djInit:function(){
+                        $('body').css({background:'#000',color:'#fff'})
+                        $('#main').attr('src','/img/logo-inverted.jpg')
                         var modifyFam = .5,                        
                         modifyDesc = 'disco',
                         modifyResults = 20,
@@ -274,6 +276,7 @@
                       e.preventDefault()
                       var voteAttr = $(this).text()
                       by.app.handleListeners.feedback(voteAttr)
+
                     })
                 }
             },            
@@ -301,7 +304,10 @@
   
                                   $('h3').text('Now Playing: ' + songTitle + ', ' + artistName)                                  
                                   $('body').attr('data-echonestid',$returnedSongId)
-                                  $('<p>Use these buttons to below to express how you feel about the music!</p>').insertAfter('h3')
+                                  
+                                  if (!$('.desc').length){
+                                    $('<p class=desc>Use these buttons to below to express how you feel about the music!</p>').insertAfter('h3')
+                                  }
   
                                   var artistId = data.response.songs[0].artist_id
                                   var songId = data.response.songs[0].id
@@ -337,7 +343,7 @@
                       }
                     }
                 }).fail(function(){
-                    $('h1').text('There is no DJ at this venue.  Maybe someone will be here soon.')                    
+                    $('h3').text('There is no DJ at this venue.  Maybe someone will be here soon.')                    
                   })
             },
             fetchToken:function() {
